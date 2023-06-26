@@ -43,8 +43,8 @@ namespace IdentityExploration.Controllers
 
             var authClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Name, user.Email)
+                // new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             foreach(var role in userRoles)
@@ -52,32 +52,21 @@ namespace IdentityExploration.Controllers
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var token = GetToken(authClaims);
+            var token = CreateToken(authClaims);
 
             return Ok(token);
         }
 
-        private string GetToken(List<Claim> claims)
+        private string CreateToken(List<Claim> clm)
         {
-            // Define the security key
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("THISISAVERYHARDSECURITYKEYNOBODYCANBREAK"));
+            var secretKey = "THISISMYVERYSECRETKEYTHATISQUITEUNBREAKABL";
+            var issuer = "YOUR_ISSUER_HERE";
+            var audience = "YOUR_AUDIENCE_HERE";
+            var expirationInMinutes = 60;
+            var claims = clm;
 
-            // Create signing credentials using the security key
-            var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            // Create a new JWT token with the provided claims and signing credentials
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1), // Token expiration time
-                signingCredentials: signingCredentials
-            );
-
-            // Generate the token string
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return tokenString;
+            var token = JwtHelper.GenerateToken(secretKey, issuer, audience, expirationInMinutes, claims);
+            return token;
         }
 
 

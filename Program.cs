@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-ConfigurationManager configuration = builder.Configuration;
 
 // Add services to the container.
 
@@ -37,27 +36,27 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 // Adding Authentication
+var secretKey = builder.Configuration.GetSection("JwtSettings").GetValue<string>("SecretKey");
+var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-
-// Adding Jwt Bearer
-.AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidAudience = configuration["JWT:ValidAudience"],
-        ValidIssuer = configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = false,
+            ValidIssuer = builder.Configuration.GetSection("JwtSettings").GetValue<string>("Issuer"),
+            ValidAudience = builder.Configuration.GetSection("JwtSettings").GetValue<string>("Audience"),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            ,
+        };
+    });
 
 var app = builder.Build();
 
@@ -68,12 +67,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Identity
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 
 app.MapControllers();
 

@@ -1,68 +1,38 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityExploration.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthorizationController : ControllerBase
+    public class AuthorizeController : ControllerBase
     {
-        [HttpGet("/authorize/public/")]
+        [HttpGet("/everyone")]
         public IActionResult F1()
         {
-            return Ok("This is an unauthorized public controller.");
+            return Ok("This is accessible by everyone.");
         }
 
         [Authorize]
-        [HttpGet("/authorize/logged/")]
+        [HttpGet("/logged")]
         public IActionResult F2()
         {
-            return Ok("This is an authorized controller, only logged in users can access");
+            return Ok("This is accessible only by the logged users.");
         }
 
         [Authorize(Roles = "admin")]
-        [HttpGet("/authorize/admin/")]
+        [HttpGet("/admin")]
         public IActionResult F3()
         {
-            return Ok("Only admins can see it.");
+            return Ok("This is accessible only by the adminstrative users.");
         }
 
-        [Authorize(Roles = "user")]
-        [HttpGet("/authorize/user/")]
-        public IActionResult F4()
-        {
-            return Ok("Only users can see it.");
-        }
-
-        [Authorize(Roles = "shop")]
-        [HttpGet("/authorize/shop/")]
+        [Authorize(Roles = "admin,moderator")]
+        [HttpGet("/adminmod")]
         public IActionResult F5()
         {
-            return Ok("Only shops can see it.");
-        }
-
-        [Authorize(Roles = "delivery")]
-        [HttpGet("/authorize/delivery/")]
-        public IActionResult F6()
-        {
-            return Ok("Only delivery man can see it.");
-        }
-
-        [Authorize(Roles = "shop")]
-        [Authorize(Roles = "delivery")]
-        [HttpGet("/authorize/shopanddelivery/")]
-        public IActionResult F7()
-        {
-            return Ok("Shop and delivery man can see it.");
-        }
-
-
-        [Authorize(Roles = "admin")]
-        [Authorize(Roles = "shop")]
-        [HttpGet("/authorize/adminandshop/")]
-        public IActionResult F8()
-        {
-            return Ok("Shop and admin man can see it.");
+            return Ok("This is accessible for both admin and moderators");
         }
     }
 }
