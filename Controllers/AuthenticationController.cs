@@ -14,14 +14,16 @@ namespace IdentityExploration.Controllers
     {
         public readonly UserManager<IdentityUser> _userManager;
         public readonly RoleManager<IdentityRole> _roleManager;
+        private readonly Token _token;
         public readonly IConfiguration _configuration;
 
         public AuthenticationController(UserManager<IdentityUser> userManager, 
-            RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+            RoleManager<IdentityRole> roleManager, IConfiguration configuration, Token token)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _token = token;
         }
 
         // Login with JWT
@@ -52,21 +54,9 @@ namespace IdentityExploration.Controllers
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var token = CreateToken(authClaims);
+            var token = _token.GetToken(authClaims);
 
             return Ok(token);
-        }
-
-        private string CreateToken(List<Claim> clm)
-        {
-            var secretKey = "THISISMYVERYSECRETKEYTHATISQUITEUNBREAKABL";
-            var issuer = "YOUR_ISSUER_HERE";
-            var audience = "YOUR_AUDIENCE_HERE";
-            var expirationInMinutes = 60;
-            var claims = clm;
-
-            var token = JwtHelper.GenerateToken(secretKey, issuer, audience, expirationInMinutes, claims);
-            return token;
         }
 
 
