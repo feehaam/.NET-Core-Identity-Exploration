@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace IdentityExploration.Controllers
+namespace IdentityExploration.Controllers.Auths
 {
     public interface Token
     {

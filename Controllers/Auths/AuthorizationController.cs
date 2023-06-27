@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IdentityExploration.Controllers
+namespace IdentityExploration.Controllers.Auths
 {
     [Route("api/[controller]")]
     [ApiController]

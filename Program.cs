@@ -1,5 +1,5 @@
 using IdentityExploration;
-using IdentityExploration.Controllers;
+using IdentityExploration.Controllers.Auths;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,5 @@
 ﻿using IdentityExploration.DTO;
+using IdentityExploration.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace IdentityExploration.Controllers
+namespace IdentityExploration.Controllers.Auths
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,7 +19,7 @@ namespace IdentityExploration.Controllers
         private readonly Token _token;
         public readonly IConfiguration _configuration;
 
-        public AuthenticationController(UserManager<Employee> userManager, 
+        public AuthenticationController(UserManager<Employee> userManager,
             RoleManager<IdentityRole> roleManager, IConfiguration configuration, Token token)
         {
             _userManager = userManager;
@@ -33,11 +34,11 @@ namespace IdentityExploration.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Email);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound("User doesn't exist.");
             }
-            if(await _userManager.CheckPasswordAsync(user, model.Password) == false)
+            if (await _userManager.CheckPasswordAsync(user, model.Password) == false)
             {
                 return Unauthorized("Wrong password");
             }
@@ -50,7 +51,7 @@ namespace IdentityExploration.Controllers
                 // new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            foreach(var role in userRoles)
+            foreach (var role in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
@@ -80,7 +81,7 @@ namespace IdentityExploration.Controllers
             }
 
             Employee user = new Employee
-            { 
+            {
                 Email = model.Email,
                 UserName = model.Email,
                 FirstName = model.FirstName,
@@ -157,7 +158,7 @@ namespace IdentityExploration.Controllers
             }
             if (!await _userManager.IsInRoleAsync(user, role))
             {
-                return NotFound("User "+email+" doesn't have the role "+role);
+                return NotFound("User " + email + " doesn't have the role " + role);
             }
             else
             {
