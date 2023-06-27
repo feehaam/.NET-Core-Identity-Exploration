@@ -20,18 +20,20 @@ namespace IdentityExploration.Controllers.Auths
         public readonly RoleManager<IdentityRole> _roleManager;
         private readonly Token _token;
         public readonly IConfiguration _configuration;
+        public readonly SignInManager<Employee> _signInManager;
 
         public AuthenticationController(UserManager<Employee> userManager,
-            RoleManager<IdentityRole> roleManager, IConfiguration configuration, Token token)
+            RoleManager<IdentityRole> roleManager, IConfiguration configuration, 
+            Token token, SignInManager<Employee> signInManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _token = token;
+            _signInManager = signInManager;
         }
 
         // Login with JWT
-
         [HttpPost("/signin")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
@@ -40,30 +42,52 @@ namespace IdentityExploration.Controllers.Auths
             {
                 return NotFound("User doesn't exist.");
             }
-            if (await _userManager.CheckPasswordAsync(user, model.Password) == false)
+
+            // Check if the user's email is verified
+            if (!await _userManager.IsEmailConfirmedAsync(user))
             {
-                return Unauthorized("Wrong password");
+                return BadRequest("Email not verified. Please verify your email before logging in.");
             }
 
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, true, lockoutOnFailure: false);
 
-            var authClaims = new List<Claim>
+            if (signInResult.Succeeded)
             {
-                new Claim(ClaimTypes.Name, user.Email)
-                // new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-            // 20. Adding all the roles of the user as claim.
-            foreach (var role in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, role));
+                // User logged in successfully
+                // Generate and return the authentication token or any other desired response
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Email)
+                };
+                // Adding all the roles of the user as a claim.
+                foreach (var role in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, role));
+                }
+                var token = _token.GetToken(authClaims);
+
+                return Ok(new { Token = token, Message = "Logged in successfully" });
             }
-
-            var token = _token.GetToken(authClaims);
-
-            return Ok(token);
+            else if (signInResult.IsLockedOut)
+            {
+                // User is locked out due to multiple failed login attempts
+                // Return appropriate response or error message
+                return Unauthorized("Account locked due to multiple failed login attempts. Please try again later.");
+            }
+            else if (signInResult.RequiresTwoFactor)
+            {
+                // User has two-factor authentication enabled and needs to provide additional verification
+                // Redirect the user to the two-factor authentication page or return appropriate response
+                return Unauthorized("Two-factor authentication is required for this account.");
+            }
+            else
+            {
+                // Login failed
+                // Return appropriate response or error message
+                return Unauthorized("Invalid username or password.");
+            }
         }
-
-
 
         // Registration
         [HttpPost("/signup/")]
