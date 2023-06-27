@@ -1,4 +1,5 @@
 ﻿using IdentityExploration.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -12,12 +13,12 @@ namespace IdentityExploration.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        public readonly UserManager<IdentityUser> _userManager;
+        public readonly UserManager<Employee> _userManager;
         public readonly RoleManager<IdentityRole> _roleManager;
         private readonly Token _token;
         public readonly IConfiguration _configuration;
 
-        public AuthenticationController(UserManager<IdentityUser> userManager, 
+        public AuthenticationController(UserManager<Employee> userManager, 
             RoleManager<IdentityRole> roleManager, IConfiguration configuration, Token token)
         {
             _userManager = userManager;
@@ -78,14 +79,20 @@ namespace IdentityExploration.Controllers
                 return BadRequest("User with same email already exist.");
             }
 
-            IdentityUser user = new IdentityUser { 
+            Employee user = new Employee
+            { 
                 Email = model.Email,
-                UserName = model.Email
+                UserName = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Age = model.Age,
+                JobPosition = model.JobPosition,
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
+                await AddRole(model.Email, "user");
                 return Ok("Account created.");
             }
             else
@@ -95,11 +102,12 @@ namespace IdentityExploration.Controllers
         }
 
         // Adding roles
+        [Authorize(Roles = "admin")]
         [HttpPost("/addrole/")]
         public async Task<IActionResult> AddRole(string email, string role)
         {
-            IdentityUser user = await _userManager.FindByEmailAsync(email);
-            if(role == null || role.Length == 0)
+            Employee user = await _userManager.FindByEmailAsync(email);
+            if (role == null || role.Length == 0)
             {
                 return BadRequest("Invalid role");
             }
@@ -111,12 +119,12 @@ namespace IdentityExploration.Controllers
             {
                 return NotFound("User not found");
             }
-            if(!UserRoles.Roles.Contains(role))
+            if (!UserRoles.Roles.Contains(role))
             {
                 return NotFound("Role not found. Available roles: ");
             }
 
-            if(! await _roleManager.RoleExistsAsync(role))
+            if (!await _roleManager.RoleExistsAsync(role))
             {
                 try
                 {
@@ -124,10 +132,37 @@ namespace IdentityExploration.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return StatusCode(500, "Server error: "+ex);
+                    return StatusCode(500, "Server error: " + ex);
                 }
             }
             return Ok(await _userManager.AddToRoleAsync(user, role));
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost("/droprole/")]
+        public async Task<IActionResult> Rroprole(string email, string role)
+        {
+            Employee user = await _userManager.FindByEmailAsync(email);
+            if (role == null || role.Length == 0)
+            {
+                return BadRequest("Invalid role");
+            }
+            else
+            {
+                role = role.ToLower();
+            }
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            if (!await _userManager.IsInRoleAsync(user, role))
+            {
+                return NotFound("User "+email+" doesn't have the role "+role);
+            }
+            else
+            {
+                return Ok(await _userManager.RemoveFromRoleAsync(user, role));
+            }
         }
 
     }

@@ -1,11 +1,12 @@
-﻿namespace IdentityExploration
-{
-    public class Employee
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string JobPosition { get; set; } = string.Empty;
+﻿using Microsoft.AspNetCore.Identity;
 
+namespace IdentityExploration
+{
+    public class Employee : IdentityUser
+    {
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public int Age { get; set; }
+        public string JobPosition { get; set; } = string.Empty;
     }
 }

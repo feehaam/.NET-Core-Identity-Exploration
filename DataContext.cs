@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityExploration
 {
-    public class DataContext : IdentityDbContext
+    public class DataContext : IdentityDbContext<Employee>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) 
         {

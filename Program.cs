@@ -23,7 +23,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 
 // Identity - initial import
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<Employee, IdentityRole>()
     .AddEntityFrameworkStores<DataContext>()
     .AddDefaultTokenProviders();
 

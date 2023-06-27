@@ -28,11 +28,11 @@ namespace IdentityExploration.Controllers
             return Ok("This is accessible only by the adminstrative users.");
         }
 
-        [Authorize(Roles = "admin,moderator")]
-        [HttpGet("/adminmod")]
+        [Authorize(Roles = "admin,shop")]
+        [HttpGet("/shop")]
         public IActionResult F5()
         {
-            return Ok("This is accessible for both admin and moderators");
+            return Ok("This is accessible for both admin and shop.");
         }
     }
 }
