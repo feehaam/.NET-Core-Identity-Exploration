@@ -1,6 +1,7 @@
 ﻿using IdentityExploration.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace IdentityExploration.Controllers.EmailVarification
 {
@@ -9,10 +10,12 @@ namespace IdentityExploration.Controllers.EmailVarification
     public class EmailVarificationTokenController : ControllerBase
     {
         private readonly UserManager<Employee> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public EmailVarificationTokenController(UserManager<Employee> userManager)
+        public EmailVarificationTokenController(UserManager<Employee> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         [HttpPost("/get_email_token")]
@@ -48,12 +51,25 @@ namespace IdentityExploration.Controllers.EmailVarification
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
+                if (!await _roleManager.RoleExistsAsync("user"))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("user"));
+                }
+                await _userManager.AddToRoleAsync(user, "user");
                 return Ok("Email confirmed successfully.");
             }
             else
             {
                 return BadRequest("Failed to confirm email.");
             }
+        }
+
+        [HttpPost("/unverify")]
+        public async Task<bool> Unverify(string email)
+        {
+            RequireEmailConfirmation uv = new RequireEmailConfirmation(_userManager);
+            bool result = await uv.Require(email);
+            return result;
         }
     }
 }

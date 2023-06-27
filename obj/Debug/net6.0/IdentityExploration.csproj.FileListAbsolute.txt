@@ -91,6 +91,3 @@ C:\Users\User\source\repos\IdentityExploration\bin\Debug\net6.0\Microsoft.AspNet
 C:\Users\User\source\repos\IdentityExploration\bin\Debug\net6.0\Microsoft.Extensions.Identity.Core.dll
 C:\Users\User\source\repos\IdentityExploration\bin\Debug\net6.0\Microsoft.Extensions.Identity.Stores.dll
 C:\Users\User\source\repos\IdentityExploration\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-C:\Users\User\source\repos\IdentityExploration\bin\Debug\net6.0\Newtonsoft.Json.dll
-C:\Users\User\source\repos\IdentityExploration\bin\Debug\net6.0\SendGrid.dll
-C:\Users\User\source\repos\IdentityExploration\bin\Debug\net6.0\StarkbankEcdsa.dll
