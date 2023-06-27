@@ -6,12 +6,20 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityExploration.Controllers.Auths
 {
+    // 14. Defined this interface for adding Token as a service rather than static class, I hate static class
     public interface Token
     {
         public string GetToken(List<Claim> claims);
     }
     public class JWT : Token
     {
+
+        // 15. This class reads all necessary values from the appsettings.json then uses those 
+        // to create secured hash code using SHA-256. The time limit for session is also defined in appsettings
+        // 16. These setup are for generating the hash code however when an user logins then the decryption and
+        // validation of the hashed JWT token are done by .net core itself with the values defined in program.cs
+        // file. Though all values are approach are same only difference is this is encryption and that is
+        // decryption See comment #17 in program.cs.
         private string _issuer;
         private string _audience;
         private string _secretKey;

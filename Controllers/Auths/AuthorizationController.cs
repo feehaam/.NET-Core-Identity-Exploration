@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityExploration.Controllers.Auths
 {
+    // 18. Just some little demo controllers with Authorization limits to test authorization
+
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorizeController : ControllerBase

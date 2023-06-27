@@ -14,7 +14,9 @@ namespace IdentityExploration.Controllers.Auths
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
+        // 19. UserManager is passed with Employee - the custom user that we created previously
         public readonly UserManager<Employee> _userManager;
+        // 20. We didn't do any customization with roles, that's why it is passed with default IdentityRole type
         public readonly RoleManager<IdentityRole> _roleManager;
         private readonly Token _token;
         public readonly IConfiguration _configuration;
@@ -50,7 +52,7 @@ namespace IdentityExploration.Controllers.Auths
                 new Claim(ClaimTypes.Name, user.Email)
                 // new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
-
+            // 20. Adding all the roles of the user as claim.
             foreach (var role in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, role));

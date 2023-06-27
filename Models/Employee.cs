@@ -2,6 +2,7 @@
 
 namespace IdentityExploration.Models
 {
+    // 11. This model is just a custom user model to add more fields in IdentityUser
     public class Employee : IdentityUser
     {
         public string FirstName { get; set; } = string.Empty;

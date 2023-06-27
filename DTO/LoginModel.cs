@@ -2,6 +2,7 @@
 
 namespace IdentityExploration.DTO
 {
+    // 11. Nothing so special to mention 
     public class LoginModel
     {
         [Required(ErrorMessage = "Email is required")]

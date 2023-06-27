@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace IdentityExploration.DTO
 {
+    // 12. Nothing so special to mention 
     public class RegisterModel
     {
         [Required]
